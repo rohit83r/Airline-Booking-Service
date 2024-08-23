@@ -1,12 +1,12 @@
-# Airline Booking System
+# Airline Booking Service
 
 ## Overview
 
-The Airline Booking System is a comprehensive application designed to handle the booking and management of flights for an airline. The system allows users to search for flights, make bookings, and manage their itineraries. Additionally, it includes an administration panel for managing flight schedules, airport information, and user roles.
+The **Airline Booking Service** is a microservices-based application designed to manage various aspects of an airline's operations, including flight booking, user authentication, flight management, and notifications. Each component of the system is designed as a separate service, allowing for scalability, maintainability, and flexibility.
 
 ## Table of Contents
 
-1. [Features](#features)
+1. [Services Overview](#services-overview)
 2. [Technologies Used](#technologies-used)
 3. [Project Structure](#project-structure)
 4. [Installation and Setup](#installation-and-setup)
@@ -15,77 +15,103 @@ The Airline Booking System is a comprehensive application designed to handle the
 7. [Running the Application](#running-the-application)
 8. [API Endpoints](#api-endpoints)
 9. [Contributing](#contributing)
+10. [License](#license)
 
+## Services Overview
 
-## Features
+### 1. API Gateway (`API_GATEWAY`)
 
-- **User Registration and Authentication**: Secure user sign-up and login using JWT token-based authentication.
-- **Role Management**: Admin and user roles with distinct privileges.
-- **Flight Management**: Create, update, delete, and search for flights.
-- **Booking Management**: Users can book, update, cancel, and view their flight reservations.
-- **Notifications**: Automated email notifications for booking confirmations, reminders, and cancellations.
-- **Admin Dashboard**: Manage flights, users, and bookings.
-- **Search Filters**: Search flights based on criteria such as departure airport, arrival airport, price range, and date.
-- **Rate Limiting**: Prevent abuse by limiting the number of requests per user/IP.
-- **Error Handling**: Comprehensive error management and logging.
-- **Scalability and Performance**: Optimized for high performance and scalability using microservices architecture.
+The API Gateway serves as the entry point for all client requests. It handles request routing, authentication, rate limiting, and load balancing.
+
+**Features:**
+- Request routing to appropriate microservices
+- Rate limiting and logging
+- Authentication checks for protected routes
+
+### 2. Authentication Service (`AUTHSERVICE`)
+
+Manages user authentication and authorization. Supports user registration, login, and role-based access control.
+
+**Features:**
+- User registration and login
+- JWT-based authentication
+- Role management (Admin, User)
+
+### 3. Booking System (`BookingSystem`)
+
+Handles all booking-related operations, including creating, updating, viewing, and canceling bookings.
+
+**Features:**
+- Book, update, and cancel flights
+- Retrieve booking history
+- Admin functionalities for managing bookings
+
+### 4. Flights and Services Management (`Flights-and-Services`)
+
+Manages all flight-related information, including scheduling, airport details, and airplane details.
+
+**Features:**
+- CRUD operations for flights, airports, airplanes
+- Flight search with filters
+
+### 5. Reminder Service (`ReminderService`)
+
+Handles notifications and reminders for users about their bookings, flight updates, etc.
+
+**Features:**
+- Send email notifications
+- Scheduled reminders using cron jobs
 
 ## Technologies Used
 
 - **Backend**: Node.js, Express.js
-- **Frontend**: React.js
 - **Database**: MySQL with Sequelize ORM
 - **Authentication**: JSON Web Tokens (JWT)
-- **Message Queue**: RabbitMQ for handling asynchronous tasks and notifications
-- **Email Service**: NodeMailer for sending email notifications
-- **Cloud Services**: AWS for deployment and other services
+- **Message Queue**: RabbitMQ for asynchronous task handling
+- **Email Service**: NodeMailer for sending emails
+- **Cloud Services**: AWS for deployment and other cloud services
 - **Version Control**: Git and GitHub
 
 ## Project Structure
 
 ```plaintext
-airline-booking-system/
-├── src/
-│   ├── config/            # Configuration files
-│   ├── controllers/       # Request handlers
-│   ├── middlewares/       # Middleware functions
-│   ├── migrations/        # Database migration files
-│   ├── models/            # Sequelize models
-│   ├── repositories/      # Data access layer
-│   ├── routes/            # API routes
-│   ├── seeders/           # Database seeding scripts
-│   ├── services/          # Business logic layer
-│   ├── utils/             # Utility functions
-│   └── index.js           # Entry point
-├── tests/                 # Unit and integration tests
-├── .env                   # Environment variables
-├── .gitignore             # Git ignore file
-├── package.json           # NPM package file
-└── README.md              # Project documentation
+Airline-Booking-Service/
+├── Backend/
+│   ├── API_GATEWAY/          # API Gateway service
+│   ├── AUTHSERVICE/          # Authentication service
+│   ├── BookingSystem/        # Booking management service
+│   ├── Flights-and-Services/ # Flights and services management
+│   └── ReminderService/      # Reminder notification service
 ```
+
+Each service folder contains its respective configuration, controllers, models, routes, services, and utility files.
 
 ## Installation and Setup
 
 1. **Clone the repository**:
 
    ```bash
-   git clone https://github.com/yourusername/airline-booking-system.git
-   cd airline-booking-system
+   git clone https://github.com/yourusername/airline-booking-service.git
+   cd Airline-Booking-Service/Backend
    ```
 
-2. **Install dependencies**:
+2. **Install dependencies for each service**:
 
    ```bash
-   npm install
+   cd API_GATEWAY && npm install
+   cd ../AUTHSERVICE && npm install
+   cd ../BookingSystem && npm install
+   cd ../Flights-and-Services && npm install
+   cd ../ReminderService && npm install
    ```
 
-3. **Create an environment file**:
+3. **Create environment files** for each service:
 
-   Copy the `.env.example` to `.env` and update the configuration according to your setup.
+   Copy `.env.example` to `.env` in each service folder and update the configurations accordingly.
 
 ## Configuration
 
-Update the `.env` file with your specific configuration details:
+Ensure each service has its `.env` file properly configured:
 
 ```plaintext
 PORT=3000
@@ -106,7 +132,7 @@ AWS_SECRET_ACCESS_KEY=your_secret_key
 
 ## Database Setup
 
-1. **Run Migrations**: To set up the database schema, run the following command:
+1. **Run Migrations**: Set up the database schema for each service using Sequelize CLI:
 
    ```bash
    npx sequelize-cli db:migrate
@@ -118,40 +144,58 @@ AWS_SECRET_ACCESS_KEY=your_secret_key
    npx sequelize-cli db:seed:all
    ```
 
+> Run these commands from the root directory of each service where Sequelize is configured.
+
 ## Running the Application
 
-To start the application, use the following command:
+Start each service individually:
 
 ```bash
+# In the API_GATEWAY directory
+npm start
+
+# In the AUTHSERVICE directory
+npm start
+
+# In the BookingSystem directory
+npm start
+
+# In the Flights-and-Services directory
+npm start
+
+# In the ReminderService directory
 npm start
 ```
 
-The server will start on the port specified in the `.env` file (default is 3000).
+Each service will run on its configured port as specified in the `.env` file.
 
 ## API Endpoints
 
-### Authentication
+### API Gateway
+
+- **GET** `/api/v1/proxy` - Proxy requests to other services
+- **POST** `/api/v1/auth` - Authenticate user requests
+
+### Authentication Service
 
 - **POST** `/auth/signup` - Register a new user
 - **POST** `/auth/login` - Login and receive a JWT token
 
-### Flights
-
-- **POST** `/flights` - Create a new flight (Admin only)
-- **GET** `/flights` - Retrieve all flights or search with filters
-- **GET** `/flights/:id` - Retrieve flight details by ID
-- **PUT** `/flights/:id` - Update flight details (Admin only)
-- **DELETE** `/flights/:id` - Delete a flight (Admin only)
-
-### Bookings
+### Booking System
 
 - **POST** `/bookings` - Create a new booking
 - **GET** `/bookings` - Retrieve all bookings for the logged-in user
-- **GET** `/bookings/:id` - Retrieve booking details by ID
 - **PUT** `/bookings/:id` - Update booking details
 - **DELETE** `/bookings/:id` - Cancel a booking
 
-### Notifications
+### Flights and Services Management
+
+- **POST** `/flights` - Create a new flight (Admin only)
+- **GET** `/flights` - Retrieve all flights or search with filters
+- **PUT** `/flights/:id` - Update flight details (Admin only)
+- **DELETE** `/flights/:id` - Delete a flight (Admin only)
+
+### Reminder Service
 
 - **GET** `/notifications` - Retrieve all notifications
 - **POST** `/notifications` - Create a new notification
